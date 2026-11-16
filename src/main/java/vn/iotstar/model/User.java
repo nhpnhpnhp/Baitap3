@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @SuppressWarnings("serial")
 @Entity
@@ -37,6 +38,18 @@ public class User implements Serializable {
     @Column(name = "createddate", nullable = false)
     private Date createdDate;
 
+    @Column(name = "active", nullable = false, columnDefinition = "bit not null default 0")
+    private boolean active;
+
+    @Column(name = "otp_code", columnDefinition = "varchar(10)")
+    private String otpCode;
+
+    @Column(name = "otp_expiry")
+    private Timestamp otpExpiry;
+
+    @Column(name = "otp_type", columnDefinition = "varchar(30)")
+    private String otpType;
+
     public User() {}
 
     public User(String email, String userName, String fullName, String passWord,
@@ -69,4 +82,12 @@ public class User implements Serializable {
     public void setPhone(String phone) { this.phone = phone; }
     public Date getCreatedDate() { return createdDate; }
     public void setCreatedDate(Date createdDate) { this.createdDate = createdDate; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+    public String getOtpCode() { return otpCode; }
+    public void setOtpCode(String otpCode) { this.otpCode = otpCode; }
+    public Timestamp getOtpExpiry() { return otpExpiry; }
+    public void setOtpExpiry(Timestamp otpExpiry) { this.otpExpiry = otpExpiry; }
+    public String getOtpType() { return otpType; }
+    public void setOtpType(String otpType) { this.otpType = otpType; }
 }

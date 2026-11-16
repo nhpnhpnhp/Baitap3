@@ -1,0 +1,8 @@
+# Copy sang .runtime/mail.properties và điền thông tin SMTP (ví dụ Gmail App Password).
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=REPLACE_WITH_YOUR_APP_PASSWORD
+MAIL_FROM=your-email@gmail.com
+MAIL_AUTH=true
+MAIL_STARTTLS=true

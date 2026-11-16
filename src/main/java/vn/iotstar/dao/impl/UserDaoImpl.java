@@ -26,6 +26,21 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findByEmail(String email) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT u FROM User u WHERE u.email = :email";
+            TypedQuery<User> query = enma.createQuery(jpql, User.class);
+            query.setParameter("email", email);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
     public void insert(User user) {
         EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
@@ -39,6 +54,25 @@ public class UserDaoImpl implements UserDao {
                 trans.rollback();
             }
             throw new IllegalStateException("Không thể lưu tài khoản.", e);
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
+    public void update(User user) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        EntityTransaction trans = enma.getTransaction();
+        try {
+            trans.begin();
+            enma.merge(user);
+            trans.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw new IllegalStateException("Không thể cập nhật tài khoản.", e);
         } finally {
             enma.close();
         }

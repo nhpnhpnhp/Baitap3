@@ -46,6 +46,15 @@ BEGIN
     );
 END;
 GO
+IF COL_LENGTH(N'dbo.[User]', N'active') IS NULL
+    ALTER TABLE dbo.[User] ADD active BIT NOT NULL CONSTRAINT DF_User_Active DEFAULT 0;
+IF COL_LENGTH(N'dbo.[User]', N'otp_code') IS NULL
+    ALTER TABLE dbo.[User] ADD otp_code VARCHAR(10) NULL;
+IF COL_LENGTH(N'dbo.[User]', N'otp_expiry') IS NULL
+    ALTER TABLE dbo.[User] ADD otp_expiry DATETIME2 NULL;
+IF COL_LENGTH(N'dbo.[User]', N'otp_type') IS NULL
+    ALTER TABLE dbo.[User] ADD otp_type VARCHAR(30) NULL;
+GO
 IF EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'baitap12_app')
 BEGIN
     GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.categories TO baitap12_app;

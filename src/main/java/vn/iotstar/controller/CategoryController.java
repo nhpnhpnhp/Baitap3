@@ -6,8 +6,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import vn.iotstar.entity.Category;
+import vn.iotstar.model.User;
 import vn.iotstar.service.ICategoryService;
 import vn.iotstar.service.impl.CategoryServiceImpl;
 import vn.iotstar.util.Constant;
@@ -29,6 +31,9 @@ public class CategoryController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!isAdminAuthorized(req, resp)) {
+            return;
+        }
         String url = req.getRequestURI();
         if (url.contains("/admin/categories")) {
             List<Category> list = cateService.findAll();
@@ -54,6 +59,9 @@ public class CategoryController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!isAdminAuthorized(req, resp)) {
+            return;
+        }
         String url = req.getRequestURI();
         if (url.contains("/admin/category/insert")) {
             String categoryname = req.getParameter("categoryname");
@@ -141,5 +149,19 @@ public class CategoryController extends HttpServlet {
     public static void deleteFile(String filePath) throws IOException {
         Path path = Paths.get(filePath);
         Files.delete(path);
+    }
+
+    private boolean isAdminAuthorized(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("account") == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return false;
+        }
+        User user = (User) session.getAttribute("account");
+        if (user.getRoleid() != 1) {
+            resp.sendError(403);
+            return false;
+        }
+        return true;
     }
 }

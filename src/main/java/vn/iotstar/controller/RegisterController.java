@@ -30,38 +30,54 @@ public class RegisterController extends HttpServlet {
         req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
     }
 
-    @SuppressWarnings("static-access")
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setCharacterEncoding("UTF-8");
         req.setCharacterEncoding("UTF-8");
-        String username = req.getParameter("username");
+        String username = trim(req.getParameter("username"));
         String password = req.getParameter("password");
-        String email = req.getParameter("email");
-        String fullname = req.getParameter("fullname");
-        String phone = req.getParameter("phone");
+        String email = trim(req.getParameter("email"));
+        String fullname = trim(req.getParameter("fullname"));
+        String phone = trim(req.getParameter("phone"));
+
+        if (username.isEmpty() || password == null || password.isEmpty() || email.isEmpty()
+                || fullname.isEmpty() || phone.isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập đầy đủ thông tin đăng ký!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
         UserService service = new UserServiceImpl();
-        String alertMsg = "";
         if (service.checkExistEmail(email)) {
-            alertMsg = "Email đã tồn tại!";
-            req.setAttribute("alert", alertMsg);
+            req.setAttribute("alert", "Email đã tồn tại!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
         if (service.checkExistUsername(username)) {
-            alertMsg = "Tài khoản đã tồn tại!";
-            req.setAttribute("alert", alertMsg);
+            req.setAttribute("alert", "Tài khoản đã tồn tại!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
+
         boolean isSuccess = service.register(username, password, email, fullname, phone);
         if (isSuccess) {
-            req.setAttribute("alert", alertMsg);
-            resp.sendRedirect(req.getContextPath() + "/login");
+            boolean mailSent = service.sendRegisterOtp(email);
+            HttpSession session = req.getSession(true);
+            session.setAttribute("verifyEmail", email);
+            if (!mailSent) {
+                session.setAttribute("otpWarning",
+                        "Tài khoản đã được tạo nhưng chưa gửi được email OTP. Vui lòng kiểm tra cấu hình SMTP và bấm Gửi lại OTP.");
+            } else {
+                session.setAttribute("otpMessage", "Mã OTP kích hoạt (hiệu lực 5 phút) đã được gửi đến email của bạn.");
+            }
+            resp.sendRedirect(req.getContextPath() + "/verify-otp");
         } else {
-            alertMsg = "System error!";
-            req.setAttribute("alert", alertMsg);
+            req.setAttribute("alert", "System error!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
         }
+    }
+
+    private String trim(String value) {
+        return value == null ? "" : value.trim();
     }
 }
