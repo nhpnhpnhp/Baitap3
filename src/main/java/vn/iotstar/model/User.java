@@ -1,10 +1,12 @@
 package vn.iotstar.model;
 
 import jakarta.persistence.*;
+import vn.iotstar.entity.Video;
 
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 @SuppressWarnings("serial")
 @Entity
@@ -50,6 +52,9 @@ public class User implements Serializable {
     @Column(name = "otp_type", columnDefinition = "varchar(30)")
     private String otpType;
 
+    @OneToMany(mappedBy = "user")
+    private List<Video> videos;
+
     public User() {}
 
     public User(String email, String userName, String fullName, String passWord,
@@ -90,4 +95,6 @@ public class User implements Serializable {
     public void setOtpExpiry(Timestamp otpExpiry) { this.otpExpiry = otpExpiry; }
     public String getOtpType() { return otpType; }
     public void setOtpType(String otpType) { this.otpType = otpType; }
+    public List<Video> getVideos() { return videos; }
+    public void setVideos(List<Video> videos) { this.videos = videos; }
 }

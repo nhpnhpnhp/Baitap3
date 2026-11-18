@@ -1,8 +1,10 @@
 package vn.iotstar.entity;
 
 import jakarta.persistence.*;
+import vn.iotstar.model.User;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "Videos")
@@ -30,9 +32,19 @@ public class Video implements Serializable {
     @Column(name = "Views")
     private int views;
 
+    @Column(name = "VideoPath", columnDefinition = "nvarchar(500) null")
+    private String videoPath;
+
+    @Column(name = "CreatedDate")
+    private Timestamp createdDate;
+
     @ManyToOne
     @JoinColumn(name = "CategoryId")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "UserId")
+    private User user;
 
     public Video() {
     }
@@ -95,11 +107,35 @@ public class Video implements Serializable {
         this.views = views;
     }
 
+    public String getVideoPath() {
+        return videoPath;
+    }
+
+    public void setVideoPath(String videoPath) {
+        this.videoPath = videoPath;
+    }
+
+    public Timestamp getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public Category getCategory() {
         return category;
     }
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
